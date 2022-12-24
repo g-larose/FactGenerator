@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -41,15 +42,26 @@ namespace FactGenerator.Helpers
                             Content = factNodes[i].InnerText
                         };
                         Facts.Add(fact);
-                        await SaveToXml(fact);
-                        await Task.Delay(200);
+                        //await SaveToXml(fact);
+                       // await Task.Delay(200);
                         Console.WriteLine($"{count} complete");
                         count++;
                     }
 
                 }
                
-            }  
+            }
+            await SaveToJson(Facts);
+
+        }
+
+        private static async Task SaveToJson(List<Fact> facts)
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            options.WriteIndented = true;
+            string json = JsonSerializer.Serialize(facts, options);
+            var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "fact.json");
+            await File.WriteAllTextAsync(jsonPath, json);
         }
 
         private static void LoadLinks()
